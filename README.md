@@ -9,3 +9,7 @@ Source Code for The Amazon Alexa Skill "DuckDuckGo", an unofficial port of DuckD
 #Purpose 
 
 use Alexa to ask DuckDuckGo questions and get answers in German
+
+## credits
+
+https://github.com/Pizzaface/Alexa-DuckDuckGo
