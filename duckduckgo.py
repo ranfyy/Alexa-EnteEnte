@@ -20,7 +20,7 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
     >>> result.answer.type
     'calc'
 
-    Keword arguments:
+    Keyword arguments:
     useragent: UserAgent to use while querying. Default: "python-duckduckgo %d" (str)
     safesearch: True for on, False for off. Default: True (bool)
     html: True to allow HTML in output. Default: False (bool)
