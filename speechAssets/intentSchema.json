@@ -5,7 +5,7 @@
       "slots": [
         {
           "name": "query",
-          "type": "AMAZON.LITERAL"
+          "type": "SEARCH"
         }
       ]
     },
