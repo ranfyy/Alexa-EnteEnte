@@ -35,6 +35,7 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
         'q': query,
         'o': 'json',
         'kp': safesearch,
+        'kl': 'de-de',
         'no_redirect': '1',
         'no_html': html,
         'd': meanings,
@@ -43,7 +44,7 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
     encparams = urllib.urlencode(params)
     url = 'http://api.duckduckgo.com/?' + encparams
 
-    request = urllib2.Request(url, headers={'User-Agent': useragent})
+    request = urllib2.Request(url, headers={'User-Agent': useragent, 'Content-Language': 'de'})
     response = urllib2.urlopen(request)
     json = j.loads(response.read())
     response.close()
@@ -176,4 +177,4 @@ def main():
                 sys.stdout.write('\n')
                 for i in q.json[key]: print('\t',i)
     else:
-        print('Usage: %s [query]' % sys.argv[0])
+        print('Usage: %s [query]' % sys.argv[0]) 
