@@ -1,10 +1,11 @@
 # Alexa-EnteEnte
-Source Code for The Amazon Alexa Skill "DuckDuckGo", an unofficial port of DuckDuckGo's Search Engine API.
+Source Code for The Amazon Alexa Skill "EnteEnte", an unofficial port of DuckDuckGo's Search Engine API.
+German (only?)
 
 ##Usage
-- "Alexa, ask DuckDuckGo What is Motorolla?"
-- "Alexa, ask DuckDuckGo, Who is Micheal Jackson?"
-- "Alexa, launch DuckDuckGo"
+- "Alexa, frage EnteEnte, Was ist Motorola?"
+- "Alexa, frage EnteEnte, Wer ist Micheal Jackson?"
+- "Alexa, starte EnteEnte"
 
 #Purpose 
 
