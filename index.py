@@ -86,20 +86,21 @@ def on_session_ended(session_ended_request, session):
 def get_welcome_response():
     session_attributes = {}
     card_title = "DuckDuckGo"
-    speech_output = "Ich kann deine Frage an Dack Dack Go richten, eine freie such maschine. " \
-                    "Stell mir eine Frage, und Ich liefere die Suchergebnisse und Informationen."
-    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel Was ist Python?"
+    speech_output = "Ich kann deine Frage an Dack Dack Go richten, eine freie Suchmaschine. " \
+                    "Stell mir eine Frage, und ich liefere dir Suchergebnisse und Informationen."
+    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session, speech_output))
+        card_title, speech_output, reprompt_text, should_end_session, speech_output, None))
 
 
 def handle_session_end_request():
     should_end_session = True
     return build_response({}, build_speechlet_response(
-        None, None, None, should_end_session, None))
+        None, None, None, should_end_session, None, None))
 
 def searchDuck(intent, session):
+    card_img = None
     if 'query' in intent['slots']:
         lookupString = intent['slots']['query']['value']
     else:
@@ -108,7 +109,7 @@ def searchDuck(intent, session):
         should_end_session = True
         reprompt_text = ""
         return build_response({}, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session))
+        card_title, speech_output, reprompt_text, should_end_session, None, None))
 
     #Gets the First Result of a DuckDuckGo
     try:
@@ -120,23 +121,24 @@ def searchDuck(intent, session):
         reprompt_text = ""
         should_end_session = True
         return build_response({}, build_speechlet_response(
-            card_title, speech_output, reprompt_text, should_end_session, card_text))
+            card_title, speech_output, reprompt_text, should_end_session, card_text, None))
     else:
         #withOut = re.sub(r"\(http\S+", "", queryRun, flags=re.MULTILINE)
         withOut = re.sub(r"http\S+", "", queryRun, flags=re.MULTILINE)
-        speech_output = withOut + ", Ich schicke einen Link zu mehr Info in die Alexa App."
+        speech_output = withOut + ", Ich schicke einen Link zu mehr Infos in die Alexa App."
         card_title = "DuckDuckGo - " + lookupString
         reprompt_text = ""
         should_end_session = True
+        card_img = queryRun.icon
         card_text = queryRun.encode('utf-8')
         return build_response({}, build_speechlet_response(
-            card_title, speech_output, reprompt_text, should_end_session, card_text))
+            card_title, speech_output, reprompt_text, should_end_session, card_text, card_img))
 
 
 # --------------- Helpers that build all of the responses ----------------------
 
 
-def build_speechlet_response(title, output, reprompt_text, should_end_session, card_text):
+def build_speechlet_response(title, output, reprompt_text, should_end_session, card_text, card_img):
     if output == None:
         return {
             'shouldEndSession': should_end_session
@@ -156,6 +158,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
             'shouldEndSession': should_end_session
         }
     else:
+	if card_img == None:
+		card_img = 'https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png'
         return {
             'outputSpeech': {
                 'type': 'PlainText',
@@ -164,6 +168,9 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
             'card': {
                 'type': 'Simple',
                 'title':  title,
+                'image': {
+                    'smallImageUrl': card_img
+            	},
                 'content': card_text
             },
             'reprompt': {
