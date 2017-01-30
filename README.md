@@ -13,5 +13,5 @@ use Alexa to ask DuckDuckGo questions and get answers in German
 
 ## credits
 
-https://github.com/Pizzaface/Alexa-DuckDuckGo
-https://github.com/crazedpsyc/python-duckduckgo/
+- https://github.com/Pizzaface/Alexa-DuckDuckGo
+- https://github.com/crazedpsyc/python-duckduckgo/
