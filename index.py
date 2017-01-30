@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 import duckduckgo
 import re
@@ -84,9 +86,9 @@ def on_session_ended(session_ended_request, session):
 def get_welcome_response():
     session_attributes = {}
     card_title = "DuckDuckGo"
-    speech_output = "I can look up your questions on Duck Duck Go, a free search engine. " \
-                    "Give me something to look up, and I'll return search results and info."
-    reprompt_text = "You can ask me something like, What is Python?"
+    speech_output = "Ich kann deine Frage an Dack Dack Go richten, eine freie such maschine. " \
+                    "Stell mir eine Frage, und Ich liefere die Suchergebnisse und Informationen."
+    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel Was ist Python?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session, speech_output))
@@ -101,7 +103,7 @@ def searchDuck(intent, session):
     if 'query' in intent['slots']:
         lookupString = intent['slots']['query']['value']
     else:
-        speech_output = "I'm sorry, I didn't understand, you can say something like 'Who is Tycho the musician?'"
+        speech_output = "Sorry, das habe ich nicht verstanden"
         card_title = None
         should_end_session = True
         reprompt_text = ""
@@ -112,8 +114,8 @@ def searchDuck(intent, session):
     try:
     	queryRun = duckduckgo.get_zci(lookupString) 
     except ValueError:
-    	speech_output = "There was a problem contacting DuckDuckGo, could you try a little later?"
-        card_title = "Hello World"
+    	speech_output = "Es gab ein Problem beim erreichen von DackDackGo, versuche es später nochmal"
+        card_title = "Hallo Welt"
         card_text = speech_output
         reprompt_text = ""
         should_end_session = True
@@ -122,7 +124,7 @@ def searchDuck(intent, session):
     else:
         #withOut = re.sub(r"\(http\S+", "", queryRun, flags=re.MULTILINE)
         withOut = re.sub(r"http\S+", "", queryRun, flags=re.MULTILINE)
-        speech_output = withOut + ", I've included a link for more info in the Alexa App."
+        speech_output = withOut + ", Ich schicke einen Link zu mehr Info in die Alexa App."
         card_title = "DuckDuckGo - " + lookupString
         reprompt_text = ""
         should_end_session = True
