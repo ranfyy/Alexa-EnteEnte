@@ -113,7 +113,7 @@ def searchDuck(intent, session):
 
     #Gets the First Result of a DuckDuckGo
     try:
-    	queryRun = duckduckgo.get_zci(lookupString) 
+    	queryRun, card_img = duckduckgo.get_zci(lookupString) 
     except ValueError:
     	speech_output = "Es gab ein Problem beim erreichen von DackDackGo, versuche es später nochmal"
         card_title = "Hallo Welt"
@@ -129,7 +129,6 @@ def searchDuck(intent, session):
         card_title = "DuckDuckGo - " + lookupString
         reprompt_text = ""
         should_end_session = True
-        card_img = queryRun.icon
         card_text = queryRun.encode('utf-8')
         return build_response({}, build_speechlet_response(
             card_title, speech_output, reprompt_text, should_end_session, card_text, card_img))
