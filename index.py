@@ -165,10 +165,11 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
                 'text': output
             },
             'card': {
-                'type': 'Simple',
+                'type': 'Standard',
                 'title':  title,
                 'image': {
-                    'smallImageUrl': card_img
+                    'smallImageUrl': card_img,
+                    'largeImageUrl': card_img
             	},
                 'content': card_text
             },
