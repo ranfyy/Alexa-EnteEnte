@@ -163,7 +163,7 @@ def get_zci(q, web_fallback=True, priority=['answer', 'abstract', 'related.0', '
     if not response: 
         response = 'Sorry, no results.'
 
-    return response
+    return response, ddg.image.url
 
 def main():
     if len(sys.argv) > 1:
