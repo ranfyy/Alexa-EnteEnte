@@ -173,7 +173,7 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
                 'type': 'Standard',
                 'title':  title,
                 'image': {
-                    'smallImageUrl': card_img,
+                    'smallImageUrl': img_small,
                     'largeImageUrl': img_large
             	},
                 'content': card_text
