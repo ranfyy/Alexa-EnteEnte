@@ -176,7 +176,7 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
                     'smallImageUrl': img_small,
                     'largeImageUrl': img_large
             	},
-                'content': card_text
+                'text': card_text
             },
             'reprompt': {
                 'outputSpeech': {
