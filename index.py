@@ -4,6 +4,11 @@ from __future__ import print_function
 import duckduckgo
 import re
 
+s3_bucket = "https://s3-eu-west-1.amazonaws.com/alexa-enteente/"
+img_vsmall = s3_bucket + "DDG-icon_256x256.png"
+img_small  = s3_bucket + "DuckDuckGo_logo_and_wordmark_(2014-present).svg(756px).png"
+img_large  = s3_bucket + "DuckDuckGo_logo_and_wordmark_(2014-present).svg+(1280px).png"
+
 def lambda_handler(event, context):
 
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
@@ -86,7 +91,7 @@ def on_session_ended(session_ended_request, session):
 def get_welcome_response():
     session_attributes = {}
     card_title = "DuckDuckGo"
-    speech_output = "Ich kann deine Frage an Dack Dack Go richten, eine freie Suchmaschine. " \
+    speech_output = "Ich kann deine Frage an DuckDuckGo richten, eine freie Suchmaschine. " \
                     "Stell mir eine Frage, und ich liefere dir Suchergebnisse und Informationen."
     reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
     should_end_session = False
@@ -157,8 +162,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
             'shouldEndSession': should_end_session
         }
     else:
-	if card_img == None:
-		card_img = 'https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png'
+        if card_img == None:
+            card_img = img_vsmall
         return {
             'outputSpeech': {
                 'type': 'PlainText',
@@ -169,7 +174,7 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
                 'title':  title,
                 'image': {
                     'smallImageUrl': card_img,
-                    'largeImageUrl': card_img
+                    'largeImageUrl': img_large
             	},
                 'content': card_text
             },
