@@ -53,7 +53,7 @@ def on_launch(launch_request, session):
     print("on_launch requestId=" + launch_request['requestId'] +
           ", sessionId=" + session['sessionId'])
     # Dispatch to your skill's launch
-    return get_welcome_response()
+    return get_hello_response()
 
 
 def on_intent(intent_request, session):
@@ -93,6 +93,15 @@ def get_welcome_response():
     card_title = "DuckDuckGo"
     speech_output = "Ich kann deine Frage an DuckDuckGo richten, eine freie Suchmaschine. " \
                     "Stell mir eine Frage, und ich liefere dir Suchergebnisse und Informationen."
+    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session, speech_output, None))
+
+def get_hello_response():
+    session_attributes = {}
+    card_title = "DuckDuckGo"
+    speech_output = "Frag mich was"
     reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
