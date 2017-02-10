@@ -1,4 +1,7 @@
 searchDuckIntent {query}
+searchDuckIntent frag enteente nach {query}
+searchDuckIntent frag enteente über {query}
 AMAZON.HelpIntent hilfe
 AMAZON.HelpIntent hilf mir
 AMAZON.HelpIntent was kannst du
+AMAZON.StopIntent Stopp
