@@ -3,10 +3,10 @@ import urllib2
 import json as j
 import sys
 
-__version__ = 0.242
+__version__ = 0.243
 
 
-def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=True, html=False, meanings=True, **kwargs):
+def query(query, lang, useragent='python-duckduckgo '+str(__version__), safesearch=True, html=False, meanings=True, **kwargs):
     """
     Query DuckDuckGo, returning a Results object.
 
@@ -35,7 +35,7 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
         'q': query,
         'o': 'json',
         'kp': safesearch,
-        'kl': 'de-de',
+        'kl': lang + '-' + lang,
         'no_redirect': '1',
         'no_html': html,
         'd': meanings,
@@ -44,7 +44,7 @@ def query(query, useragent='python-duckduckgo '+str(__version__), safesearch=Tru
     encparams = urllib.urlencode(params)
     url = 'http://api.duckduckgo.com/?' + encparams
 
-    request = urllib2.Request(url, headers={'User-Agent': useragent, 'Content-Language': 'de'})
+    request = urllib2.Request(url, headers={'User-Agent': useragent, 'Content-Language': lang})
     response = urllib2.urlopen(request)
     json = j.loads(response.read())
     response.close()
@@ -128,14 +128,14 @@ class Definition(object):
         self.source = json.get('DefinitionSource')
 
 
-def get_zci(q, web_fallback=True, priority=['answer', 'abstract', 'related.0', 'definition'], urls=True, **kwargs):
+def get_zci(q, lang, web_fallback=True, priority=['answer', 'abstract', 'related.0', 'definition'], urls=True, **kwargs):
     '''A helper method to get a single (and hopefully the best) ZCI result.
     priority=list can be used to set the order in which fields will be checked for answers.
     Use web_fallback=True to fall back to grabbing the first web result.
     passed to query. This method will fall back to 'Sorry, no results.' 
     if it cannot find anything.'''
 
-    ddg = query('\\'+q, **kwargs)
+    ddg = query('\\'+q, lang, **kwargs)
     response = ''
 
     for p in priority:
