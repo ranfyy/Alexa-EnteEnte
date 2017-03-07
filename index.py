@@ -4,10 +4,12 @@ from __future__ import print_function
 import duckduckgo
 import re
 
-s3_bucket = "https://s3-eu-west-1.amazonaws.com/alexa-enteente/"
-img_vsmall = s3_bucket + "DDG-icon_256x256.png"
-img_small  = s3_bucket + "DuckDuckGo_logo_and_wordmark_(2014-present).svg(756px).png"
-img_large  = s3_bucket + "DuckDuckGo_logo_and_wordmark_(2014-present).svg+(1280px).png"
+s3_bucket  = "https://s3-eu-west-1.amazonaws.com/alexa-enteente/"
+img_small  = s3_bucket + "sketch-756.png"
+img_large  = s3_bucket + "sketch-1280.png"
+myname     = 'Quack-Quack'
+lang       = ''
+
 
 def lambda_handler(event, context):
 
@@ -26,6 +28,12 @@ def lambda_handler(event, context):
     #         "amzn1.echo-sdk-ams.app.[unique-value-here]"):
     #     raise ValueError("Invalid Application ID")
 
+    tmp = event['request']['locale']
+    tmp = tmp.split('-')
+    lang = tmp[0]
+
+    print('lang: ' + lang)
+
     if event['session']['new']:
         on_session_started({'requestId': event['request']['requestId']},
                            event['session'])
@@ -33,7 +41,7 @@ def lambda_handler(event, context):
     if event['request']['type'] == "LaunchRequest":
         return on_launch(event['request'], event['session'])
     elif event['request']['type'] == "IntentRequest":
-        return on_intent(event['request'], event['session'])
+        return on_intent(event['request'], event['session'], lang)
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
 
@@ -53,10 +61,10 @@ def on_launch(launch_request, session):
     print("on_launch requestId=" + launch_request['requestId'] +
           ", sessionId=" + session['sessionId'])
     # Dispatch to your skill's launch
-    return get_hello_response()
+    return get_hello_response(lang)
 
 
-def on_intent(intent_request, session):
+def on_intent(intent_request, session, lang):
     """ Called when the user specifies an intent for this skill """
 
     print("on_intent requestId=" + intent_request['requestId'] +
@@ -67,9 +75,9 @@ def on_intent(intent_request, session):
 
     # Dispatch to your skill's intent handlers
     if intent_name == "searchDuckIntent":
-        return searchDuck(intent, session)
+        return searchDuck(intent, session, lang)
     elif intent_name == "AMAZON.HelpIntent":
-        return get_welcome_response()
+        return get_welcome_response(lang)
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         return handle_session_end_request()
     else:
@@ -88,21 +96,35 @@ def on_session_ended(session_ended_request, session):
 # --------------- Functions that control the skill's behavior ------------------
 
 
-def get_welcome_response():
+def get_welcome_response(lang):
     session_attributes = {}
-    card_title = "DuckDuckGo"
-    speech_output = "Ich kann deine Frage an DuckDuckGo richten, eine freie Suchmaschine. " \
+    if lang == 'de':
+        speech_output = "Ich kann deine Frage an DackDackGo richten, eine freie Suchmaschine. " \
                     "Stell mir eine Frage, und ich liefere dir Suchergebnisse und Informationen."
-    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
+        reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
+        myname = 'Ente-Ente'
+    elif lang == 'en':
+        speech_output = "I can look up your questions on Duck Duck Go, a free search engine. " \
+                    "Give me something to look up, and I'll return search results and info."
+        reprompt_text = "You can ask me something like, What is Python?"
+        myname = 'Quack-Quack'
+    card_title = myname
+
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session, speech_output, None))
 
-def get_hello_response():
+def get_hello_response(lang):
     session_attributes = {}
-    card_title = "DuckDuckGo"
-    speech_output = "Frag mich was"
-    reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
+    if lang == 'de':
+        speech_output = "Frag mich was!"
+        reprompt_text = "Du kannst mich alles fragen wie zum Beispiel: Was ist Python?"
+        myname = "Ente Ente"
+    elif lang == 'en':
+        speech_output = "Ask me something!"
+        reprompt_text = "You can ask me something like, What is Python?"
+    card_title = myname
+
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session, speech_output, None))
@@ -113,24 +135,32 @@ def handle_session_end_request():
     return build_response({}, build_speechlet_response(
         None, None, None, should_end_session, None, None))
 
-def searchDuck(intent, session):
+def searchDuck(intent, session, lang):
     card_img = None
     if 'query' in intent['slots']:
         lookupString = intent['slots']['query']['value']
     else:
-        speech_output = "Sorry, das habe ich nicht verstanden"
+        speech_output = "I'm sorry, I didn't understand, you can say something like 'Who is Tycho the musician?'"
+        if lang == 'de':
+            speech_output = "Sorry, das habe ich nicht verstanden"
+        elif lang == 'en':
+            speech_output = "I'm sorry, I didn't understand, you can say something like 'Who is Tycho the musician?'"
         card_title = None
         should_end_session = True
         reprompt_text = ""
         return build_response({}, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session, None, None))
+            card_title, speech_output, reprompt_text, should_end_session, None, None))
 
     #Gets the First Result of a DuckDuckGo
     try:
-    	queryRun, card_img = duckduckgo.get_zci(lookupString) 
+        queryRun, card_img = duckduckgo.get_zci(lookupString, lang) 
     except ValueError:
-    	speech_output = "Es gab ein Problem beim erreichen von DackDackGo, versuche es später nochmal"
-        card_title = "Hallo Welt"
+        if lang == 'de':
+            speech_output = "Es gab ein Problem beim erreichen von DackDackGo, versuche es später nochmal"
+            card_title = "Hallo Welt"
+        elif lang == 'en':
+            speech_output = "There was a problem contacting DuckDuckGo, could you try a little later?"
+            card_title = "Hello World"
         card_text = speech_output
         reprompt_text = ""
         should_end_session = True
@@ -139,8 +169,12 @@ def searchDuck(intent, session):
     else:
         #withOut = re.sub(r"\(http\S+", "", queryRun, flags=re.MULTILINE)
         withOut = re.sub(r"http\S+", "", queryRun, flags=re.MULTILINE)
-        speech_output = withOut + ", Ich schicke einen Link zu mehr Infos in die Alexa App."
-        card_title = "DuckDuckGo - " + lookupString
+        speech_output = withOut
+        if lang == 'de':
+            speech_output = withOut + ", Ich schicke einen Link zu mehr Infos in die Alexa App."
+        elif lang == 'en':
+            speech_output = withOut + ", I've included a link for more info in the Alexa App."
+        card_title = myname + " - " + lookupString
         reprompt_text = ""
         should_end_session = True
         card_text = queryRun.encode('utf-8')
@@ -171,8 +205,6 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
             'shouldEndSession': should_end_session
         }
     else:
-        if card_img == None:
-            card_img = img_vsmall
         return {
             'outputSpeech': {
                 'type': 'PlainText',
@@ -184,7 +216,7 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session, c
                 'image': {
                     'smallImageUrl': img_small,
                     'largeImageUrl': img_large
-            	},
+                },
                 'text': card_text
             },
             'reprompt': {
