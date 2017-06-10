@@ -3,7 +3,7 @@ import urllib2
 import json as j
 import sys
 
-__version__ = 0.243
+__version__ = 0.246
 
 
 def query(query, lang, useragent='python-duckduckgo '+str(__version__), safesearch=True, html=False, meanings=True, **kwargs):
@@ -42,7 +42,8 @@ def query(query, lang, useragent='python-duckduckgo '+str(__version__), safesear
         }
     params.update(kwargs)
     encparams = urllib.urlencode(params)
-    url = 'http://api.duckduckgo.com/?' + encparams
+    url = 'https://api.duckduckgo.com/?' + encparams
+    print('ddg: ' +url )
 
     request = urllib2.Request(url, headers={'User-Agent': useragent, 'Content-Language': lang})
     response = urllib2.urlopen(request)
@@ -132,11 +133,12 @@ def get_zci(q, lang, web_fallback=True, priority=['answer', 'abstract', 'related
     '''A helper method to get a single (and hopefully the best) ZCI result.
     priority=list can be used to set the order in which fields will be checked for answers.
     Use web_fallback=True to fall back to grabbing the first web result.
-    passed to query. This method will fall back to 'Sorry, no results.' 
+    passed to query. This method will fall back to 'Sorry, no results.'
     if it cannot find anything.'''
 
     ddg = query('\\'+q, lang, **kwargs)
     response = ''
+    url = ''
 
     for p in priority:
         ps = p.split('.')
@@ -144,37 +146,41 @@ def get_zci(q, lang, web_fallback=True, priority=['answer', 'abstract', 'related
         index = int(ps[1]) if len(ps) > 1 else None
 
         result = getattr(ddg, type)
-        if index is not None: 
+        if index is not None:
             if not hasattr(result, '__getitem__'): raise TypeError('%s field is not indexable' % type)
             result = result[index] if len(result) > index else None
         if not result: continue
 
         if result.text: response = result.text
-        if result.text and hasattr(result,'url') and urls: 
-            if result.url: response += ' (%s)' % result.url
+        if result.text and hasattr(result,'url') and urls:
+            if result.url:
+                url = result.url
         if response: break
 
     # if there still isn't anything, try to get the first web result
     if not response and web_fallback:
-        if ddg.redirect.url:
-            response = ddg.redirect.url
+        if hasattr(ddg.redirect,'url'):
+            if ddg.redirect.url:
+                response = ddg.redirect.url
 
     # final fallback
-    if not response: 
-        response = 'Sorry, no results.'
+    if not response:
+        response = '-no-results-'
 
-    return response, ddg.image.url
+    return response, ddg.image.url, url
 
 def main():
     if len(sys.argv) > 1:
-        q = query(' '.join(sys.argv[1:]))
+        q = query(' '.join(sys.argv[1:]), 'de' )
         keys = q.json.keys()
         keys.sort()
         for key in keys:
             sys.stdout.write(key)
             if type(q.json[key]) in [str,unicode]: print(':', q.json[key])
-            else: 
+            else:
                 sys.stdout.write('\n')
-                for i in q.json[key]: print('\t',i)
+                for i in q.json[key]: print('\t', str(i))
     else:
-        print('Usage: %s [query]' % sys.argv[0]) 
+        print('Usage: %s [query]' % sys.argv[0])
+
+main()
